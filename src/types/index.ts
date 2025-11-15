@@ -12,11 +12,20 @@ export interface Yapper {
   smartPercentage: number
   xIndex: number // X 종합 지수
   xIndexChange24h: number // 24시간 변화율
+  yaps_l24h?: number // 지난 24시간 동안 얻은 Yap 수 (Kaito API에서 제공)
 }
 
 export interface XIndexDataPoint {
   timestamp: number
   value: number
+}
+
+export interface YapDataPoint {
+  date: string // YYYY-MM-DD 형식
+  timestamp: number
+  dailyYaps: number // 해당 날짜에 얻은 Yap 수
+  changeFromPrevious: number // 전날 대비 변화량
+  changePercentage: number // 전날 대비 변화율 (%)
 }
 
 export interface Position {
@@ -91,5 +100,30 @@ export interface MarketAnalytics {
     date: string
     volume: number
   }>
+}
+
+// Kaito API 응답 타입
+export interface KaitoAPIResponse {
+  user_id: string
+  username: string
+  yaps_all: number
+  yaps_l24h: number
+  yaps_l48h: number
+  yaps_l7d: number
+  yaps_l30d: number
+  yaps_l3m: number
+  yaps_l6m: number
+  yaps_l12m: number
+}
+
+// Twitter API 응답 타입 (예시 - 실제 API 구조에 맞게 수정 필요)
+export interface TwitterAPIResponse {
+  id?: string
+  name?: string
+  username: string
+  followers_count?: number
+  smart_followers?: number
+  profile_image_url?: string
+  // TODO: 실제 Twitter API 응답 구조에 맞게 필드 추가
 }
 

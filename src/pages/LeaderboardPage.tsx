@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { mockYappers } from '../data/mockData'
-import { Yapper } from '../types'
+import { mockYappers, mockYapHistory } from '../data/mockData'
 import { Search, TrendingUp, TrendingDown } from 'lucide-react'
 
 type TimeFilter = '24H' | '48H' | '7D' | '30D' | '3M' | '6M' | '12M' | 'All'
@@ -17,15 +16,15 @@ export default function LeaderboardPage() {
     )
   }, [searchQuery])
 
-  // 트리맵 크기 계산 (X Index 기반)
-  const getCardSize = (xIndex: number, maxIndex: number) => {
+  // 트리맵 크기 계산 (Total Yaps 기반)
+  const getCardSize = (totalYaps: number, maxYaps: number) => {
     const minSize = 200
     const maxSize = 400
-    const ratio = xIndex / maxIndex
+    const ratio = totalYaps / maxYaps
     return minSize + (maxSize - minSize) * ratio
   }
 
-  const maxXIndex = Math.max(...filteredYappers.map(y => y.xIndex))
+  const maxTotalYaps = Math.max(...filteredYappers.map(y => y.totalYaps))
 
   return (
     <div className="h-full bg-dark-bg">
@@ -60,11 +59,10 @@ export default function LeaderboardPage() {
               <button
                 key={filter}
                 onClick={() => setTimeFilter(filter)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  timeFilter === filter
-                    ? 'bg-monad-purple-500/40 text-white border border-monad-purple-500/60 shadow-md shadow-monad-purple-500/20'
-                    : 'bg-dark-card/60 text-gray-300 hover:text-white hover:bg-dark-card/80 border border-dark-border/50'
-                }`}
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${timeFilter === filter
+                  ? 'bg-monad-purple-500/40 text-white border border-monad-purple-500/60 shadow-md shadow-monad-purple-500/20'
+                  : 'bg-dark-card/60 text-gray-300 hover:text-white hover:bg-dark-card/80 border border-dark-border/50'
+                  }`}
               >
                 {filter}
               </button>
@@ -75,9 +73,28 @@ export default function LeaderboardPage() {
         {/* Tree Map Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredYappers.map((yapper) => {
-            const isPositive = yapper.xIndexChange24h >= 0
-            const cardSize = getCardSize(yapper.xIndex, maxXIndex)
-            
+            // 24h Change 계산: mockYapHistory에서 전날과 오늘의 dailyYaps를 비교 (개수로 표시)
+            const yapHistory = mockYapHistory[yapper.id] || []
+            let yapChange24h = 0
+
+            if (yapHistory.length >= 2) {
+              // 최근 2일의 데이터 (오늘, 어제)
+              const todayData = yapHistory[yapHistory.length - 1]
+              const yesterdayData = yapHistory[yapHistory.length - 2]
+
+              // 전날 대비 변화량 계산 (개수)
+              yapChange24h = todayData.dailyYaps - yesterdayData.dailyYaps
+            } else if (yapHistory.length === 1) {
+              // 데이터가 1일만 있으면 yaps_l24h를 그대로 사용
+              yapChange24h = yapper.yaps_l24h || 0
+            } else {
+              // 데이터가 없으면 yaps_l24h를 그대로 사용
+              yapChange24h = yapper.yaps_l24h || 0
+            }
+
+            const isPositive = yapChange24h >= 0
+            const cardSize = getCardSize(yapper.totalYaps, maxTotalYaps)
+
             return (
               <Link
                 key={yapper.id}
@@ -87,7 +104,7 @@ export default function LeaderboardPage() {
               >
                 {/* Background Gradient */}
                 <div className="absolute inset-0 bg-gradient-to-br from-monad-purple-500/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                
+
                 {/* Rank Badge */}
                 <div className="absolute top-4 left-4">
                   {yapper.rank <= 3 ? (
@@ -113,9 +130,8 @@ export default function LeaderboardPage() {
                         alt={yapper.name}
                         className="w-16 h-16 rounded-2xl border-2 border-dark-border/50 group-hover:border-monad-purple-500/60 transition-colors shadow-lg"
                       />
-                      <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-dark-card ${
-                        isPositive ? 'bg-green-400' : 'bg-red-400'
-                      }`}></div>
+                      <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-dark-card ${isPositive ? 'bg-green-400' : 'bg-red-400'
+                        }`}></div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-white text-lg truncate">{yapper.name}</h3>
@@ -126,21 +142,21 @@ export default function LeaderboardPage() {
                   {/* Stats */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-400 text-xs">X Index</span>
+                      <span className="text-gray-400 text-xs">Total Yaps</span>
                       <div className="flex items-center gap-1.5">
                         {isPositive ? (
                           <TrendingUp className="w-4 h-4 text-green-400" />
                         ) : (
                           <TrendingDown className="w-4 h-4 text-red-400" />
                         )}
-                        <span className="font-bold text-white text-lg">{yapper.xIndex.toFixed(2)}</span>
+                        <span className="font-bold text-white text-lg">{yapper.totalYaps.toLocaleString()}</span>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <span className="text-gray-400 text-xs">24h Change</span>
                       <span className={`font-semibold ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                        {isPositive ? '+' : ''}{yapper.xIndexChange24h.toFixed(2)}%
+                        {isPositive ? '+' : ''}{yapChange24h.toLocaleString()} Yap
                       </span>
                     </div>
 
