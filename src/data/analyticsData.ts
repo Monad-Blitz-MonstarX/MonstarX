@@ -4,24 +4,24 @@ import { UserTradingStats, YapperTradingStats, MarketAnalytics, Position, Trade 
 export const mockUserStats: UserTradingStats = {
   totalTrades: 47,
   winRate: 63.8,
-  totalPnL: 125430.50,
+  totalPnL: 1254.30, // 현실적인 금액
   averageLeverage: 3.2,
   longShortRatio: 0.68, // 68% 롱
   favoriteYappers: [
-    { yapperId: '1', yapperName: 'Haseeb', tradeCount: 12, totalPnL: 45230 },
-    { yapperId: '2', yapperName: 'Simon', tradeCount: 8, totalPnL: 23450 },
-    { yapperId: '3', yapperName: 'DonAlt', tradeCount: 7, totalPnL: 18920 },
-    { yapperId: '4', yapperName: 'Arthur', tradeCount: 6, totalPnL: 15670 },
-    { yapperId: '5', yapperName: 'Mikko', tradeCount: 5, totalPnL: 12340 },
+    { yapperId: '1', yapperName: 'Haseeb', tradeCount: 12, totalPnL: 452.30 },
+    { yapperId: '2', yapperName: 'Simon', tradeCount: 8, totalPnL: 234.50 },
+    { yapperId: '3', yapperName: 'DonAlt', tradeCount: 7, totalPnL: 189.20 },
+    { yapperId: '4', yapperName: 'Arthur', tradeCount: 6, totalPnL: 156.70 },
+    { yapperId: '5', yapperName: 'Mikko', tradeCount: 5, totalPnL: 123.40 },
   ],
   tradingHistory: [
-    { date: '11/09', trades: 3, pnl: 1200 },
-    { date: '11/10', trades: 5, pnl: -800 },
-    { date: '11/11', trades: 4, pnl: 2100 },
-    { date: '11/12', trades: 6, pnl: 3400 },
-    { date: '11/13', trades: 7, pnl: 1800 },
-    { date: '11/14', trades: 5, pnl: -500 },
-    { date: '11/15', trades: 4, pnl: 2300 },
+    { date: '11/09', trades: 3, pnl: 12.00 },
+    { date: '11/10', trades: 5, pnl: -8.00 },
+    { date: '11/11', trades: 4, pnl: 21.00 },
+    { date: '11/12', trades: 6, pnl: 34.00 },
+    { date: '11/13', trades: 7, pnl: 18.00 },
+    { date: '11/14', trades: 5, pnl: -5.00 },
+    { date: '11/15', trades: 4, pnl: 23.00 },
   ],
 }
 
@@ -102,56 +102,58 @@ export const mockMarketAnalytics: MarketAnalytics = {
   ],
 }
 
-// 포지션 더미 데이터
+// 포지션 더미 데이터 (MON 기준)
+// size는 USDC 가치로 표시되지만, 실제로는 MON 토큰으로 거래됨
 export const mockPositions: Position[] = [
   {
     id: '1',
     yapperId: '1',
     type: 'long',
-    size: 50000,
+    size: 22.50, // 500 MON * 0.045 = $22.50 USDC (현실적인 금액)
     entryPrice: 120.5,
-    leverage: 5,
+    leverage: 3, // 5 MON x 3 = 15 MON 포지션
     liquidationPrice: 101.2,
-    currentPnL: 12500,
+    currentPnL: 5.63, // 현실적인 손익 ($125 → $5.63)
     pnlPercentage: 25.0,
   },
   {
     id: '2',
     yapperId: '3',
     type: 'short',
-    size: 30000,
+    size: 13.50, // 300 MON * 0.045 = $13.50 USDC
     entryPrice: 85.3,
     leverage: 3,
     liquidationPrice: 95.8,
-    currentPnL: -1200,
+    currentPnL: -0.54, // $12 → $0.54
     pnlPercentage: -4.0,
   },
   {
     id: '3',
     yapperId: '2',
     type: 'long',
-    size: 25000,
+    size: 11.25, // 250 MON * 0.045 = $11.25 USDC
     entryPrice: 95.8,
     leverage: 4,
     liquidationPrice: 78.5,
-    currentPnL: 3200,
+    currentPnL: 1.44, // $32 → $1.44
     pnlPercentage: 12.8,
   },
 ]
 
-// 거래 히스토리 더미 데이터
+// 거래 히스토리 더미 데이터 (MON 기준)
+// size는 USDC 가치로 표시되지만, 실제로는 MON 토큰으로 거래됨
 export const mockTradeHistory: Trade[] = [
   {
     id: 't1',
     yapperId: '1',
     yapperName: 'Haseeb',
     type: 'long',
-    size: 30000,
+    size: 13.50, // 300 MON * 0.045 = $13.50 USDC
     entryPrice: 115.2,
     exitPrice: 125.8,
     timestamp: Date.now() - 7 * 24 * 60 * 60 * 1000,
     closedAt: Date.now() - 5 * 24 * 60 * 60 * 1000,
-    pnl: 9200,
+    pnl: 4.14, // $92 → $4.14
     pnlPercentage: 30.7,
     status: 'closed',
   },
@@ -160,12 +162,12 @@ export const mockTradeHistory: Trade[] = [
     yapperId: '2',
     yapperName: 'Simon',
     type: 'long',
-    size: 20000,
+    size: 9.00, // 200 MON * 0.045 = $9.00 USDC
     entryPrice: 92.5,
     exitPrice: 98.3,
     timestamp: Date.now() - 6 * 24 * 60 * 60 * 1000,
     closedAt: Date.now() - 4 * 24 * 60 * 60 * 1000,
-    pnl: 6200,
+    pnl: 2.79, // $62 → $2.79
     pnlPercentage: 31.0,
     status: 'closed',
   },
@@ -174,12 +176,12 @@ export const mockTradeHistory: Trade[] = [
     yapperId: '4',
     yapperName: 'Arthur',
     type: 'short',
-    size: 15000,
+    size: 6.75, // 150 MON * 0.045 = $6.75 USDC
     entryPrice: 78.5,
     exitPrice: 75.2,
     timestamp: Date.now() - 5 * 24 * 60 * 60 * 1000,
     closedAt: Date.now() - 3 * 24 * 60 * 60 * 1000,
-    pnl: 4950,
+    pnl: 2.23, // $49.50 → $2.23
     pnlPercentage: 33.0,
     status: 'closed',
   },
@@ -188,12 +190,12 @@ export const mockTradeHistory: Trade[] = [
     yapperId: '3',
     yapperName: 'DonAlt',
     type: 'short',
-    size: 25000,
+    size: 11.25, // 250 MON * 0.045 = $11.25 USDC
     entryPrice: 88.2,
     exitPrice: 91.5,
     timestamp: Date.now() - 4 * 24 * 60 * 60 * 1000,
     closedAt: Date.now() - 2 * 24 * 60 * 60 * 1000,
-    pnl: -8250,
+    pnl: -3.71, // -$82.50 → -$3.71
     pnlPercentage: -33.0,
     status: 'closed',
   },
@@ -202,12 +204,12 @@ export const mockTradeHistory: Trade[] = [
     yapperId: '5',
     yapperName: 'Mikko',
     type: 'long',
-    size: 18000,
+    size: 8.10, // 180 MON * 0.045 = $8.10 USDC
     entryPrice: 62.3,
     exitPrice: 68.9,
     timestamp: Date.now() - 3 * 24 * 60 * 60 * 1000,
     closedAt: Date.now() - 1 * 24 * 60 * 60 * 1000,
-    pnl: 11880,
+    pnl: 5.35, // $118.80 → $5.35
     pnlPercentage: 66.0,
     status: 'closed',
   },

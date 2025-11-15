@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Trophy, Wallet } from 'lucide-react'
+import { Trophy, Wallet, LogOut } from 'lucide-react'
+import { useWallet } from '../contexts/WalletContext'
 
 interface LayoutProps {
   children: ReactNode
@@ -8,6 +9,12 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation()
+  const { address, isConnected, isMonadTestnet, connectWallet, disconnectWallet, switchToMonadTestnet } = useWallet()
+
+  // 주소 축약 표시 함수
+  const formatAddress = (addr: string) => {
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`
+  }
 
   return (
     <div className="flex h-screen bg-dark-bg">
@@ -62,10 +69,36 @@ export default function Layout({ children }: LayoutProps) {
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
-            <button className="px-5 py-2 bg-dark-card/80 hover:bg-dark-card rounded-xl text-sm text-gray-200 transition-all duration-200 border border-dark-border/50 hover:border-monad-purple-500/40 hover:shadow-md hover:shadow-monad-purple-500/10">
-              Connect Wallet
-            </button>
+          <div className="flex items-center gap-3">
+            {isConnected ? (
+              <>
+                {!isMonadTestnet && (
+                  <button
+                    onClick={switchToMonadTestnet}
+                    className="px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-400 text-xs rounded-lg border border-yellow-500/40 transition-all duration-200"
+                  >
+                    Switch to Monad
+                  </button>
+                )}
+                <div className="px-4 py-2 bg-dark-card/80 rounded-xl text-sm text-gray-200 border border-dark-border/50">
+                  {formatAddress(address!)}
+                </div>
+                <button
+                  onClick={disconnectWallet}
+                  className="px-4 py-2 bg-dark-card/80 hover:bg-dark-card rounded-xl text-sm text-gray-200 transition-all duration-200 border border-dark-border/50 hover:border-red-500/40 hover:shadow-md hover:shadow-red-500/10 flex items-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Disconnect
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={connectWallet}
+                className="px-5 py-2 bg-dark-card/80 hover:bg-dark-card rounded-xl text-sm text-gray-200 transition-all duration-200 border border-dark-border/50 hover:border-monad-purple-500/40 hover:shadow-md hover:shadow-monad-purple-500/10"
+              >
+                Connect Wallet
+              </button>
+            )}
             <div className="w-10 h-10 bg-dark-card/80 rounded-xl flex items-center justify-center cursor-pointer hover:bg-dark-card transition-all duration-200 border border-dark-border/50 hover:border-monad-purple-500/40 hover:shadow-md hover:shadow-monad-purple-500/10">
               <div className="w-6 h-6 bg-monad-purple-500 rounded-lg"></div>
             </div>

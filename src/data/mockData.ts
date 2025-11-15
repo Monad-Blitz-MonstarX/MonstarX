@@ -1,4 +1,4 @@
-import { Yapper, XIndexDataPoint } from '../types'
+import { Yapper, XIndexDataPoint, YapDataPoint } from '../types'
 
 // 더미 야퍼 데이터
 export const mockYappers: Yapper[] = [
@@ -15,7 +15,7 @@ export const mockYappers: Yapper[] = [
     followers: 132363,
     smartPercentage: 4.11,
     xIndex: 125.5,
-    xIndexChange24h: 5.2,
+    xIndexChange24h: 2.5, // 현실적인 변화율
   },
   {
     id: '2',
@@ -30,7 +30,7 @@ export const mockYappers: Yapper[] = [
     followers: 10000,
     smartPercentage: 7.31,
     xIndex: 98.3,
-    xIndexChange24h: -2.1,
+    xIndexChange24h: -1.2,
   },
   {
     id: '3',
@@ -45,7 +45,7 @@ export const mockYappers: Yapper[] = [
     followers: 696122,
     smartPercentage: 0.64,
     xIndex: 87.6,
-    xIndexChange24h: 3.8,
+    xIndexChange24h: 1.8,
   },
   {
     id: '4',
@@ -60,7 +60,7 @@ export const mockYappers: Yapper[] = [
     followers: 205760,
     smartPercentage: 2.86,
     xIndex: 76.2,
-    xIndexChange24h: -1.5,
+    xIndexChange24h: -0.8,
   },
   {
     id: '5',
@@ -75,7 +75,7 @@ export const mockYappers: Yapper[] = [
     followers: 20713,
     smartPercentage: 7.08,
     xIndex: 65.8,
-    xIndexChange24h: 8.3,
+    xIndexChange24h: 3.2,
   },
   {
     id: '6',
@@ -105,7 +105,7 @@ export const mockYappers: Yapper[] = [
     followers: 52020,
     smartPercentage: 1.94,
     xIndex: 43.7,
-    xIndexChange24h: 2.4,
+    xIndexChange24h: 1.2,
   },
   {
     id: '8',
@@ -120,7 +120,7 @@ export const mockYappers: Yapper[] = [
     followers: 130821,
     smartPercentage: 4.24,
     xIndex: 38.9,
-    xIndexChange24h: -3.2,
+    xIndexChange24h: -1.5,
   },
 ]
 
@@ -136,6 +136,41 @@ export function generateMockXIndexData(yapperId: string, baseValue: number): XIn
     const randomChange = (Math.random() - 0.5) * 2
     const value = baseValue + randomChange * 5 + Math.sin(i / 3) * 3
     data.push({ timestamp, value: Math.max(0, value) })
+  }
+  
+  return data
+}
+
+// 30일 Yap 개수 차트 데이터 생성 함수 (전날 대비 % 변화)
+export function generateMockYapData(yapperId: string, baseYapCount: number): YapDataPoint[] {
+  const data: YapDataPoint[] = []
+  const today = new Date()
+  
+  // 30일 전부터 오늘까지
+  for (let i = 29; i >= 0; i--) {
+    const date = new Date(today)
+    date.setDate(date.getDate() - i)
+    const dateStr = date.toISOString().split('T')[0] // YYYY-MM-DD
+    
+    const previousCount = i === 29 ? baseYapCount : data[data.length - 1].yapCount
+    
+    // 전날 대비 변화율 (%)
+    // 현실적인 범위: -5% ~ +5%
+    const changePercentage = (Math.random() - 0.5) * 10 // -5% ~ +5%
+    const changeAmount = Math.floor(previousCount * (changePercentage / 100))
+    const yapCount = Math.max(0, previousCount + changeAmount)
+    
+    // 실제 변화율 재계산
+    const actualChangePercentage = previousCount > 0 
+      ? ((yapCount - previousCount) / previousCount) * 100 
+      : 0
+    
+    data.push({
+      date: dateStr,
+      yapCount,
+      changeFromPrevious: changeAmount,
+      changePercentage: actualChangePercentage,
+    })
   }
   
   return data

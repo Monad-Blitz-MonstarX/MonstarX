@@ -19,6 +19,14 @@ export interface XIndexDataPoint {
   value: number
 }
 
+// Yap 개수 차트 데이터 포인트
+export interface YapDataPoint {
+  date: string // YYYY-MM-DD 형식
+  yapCount: number // 해당 날짜의 Yap 개수
+  changeFromPrevious: number // 전날 대비 변화량
+  changePercentage: number // 전날 대비 변화율 (%)
+}
+
 export interface Position {
   id: string
   yapperId: string

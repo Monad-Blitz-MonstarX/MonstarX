@@ -4,9 +4,10 @@
 
 ## 기능
 
-- **리더보드**: 상위 야퍼(Yapper)들의 리스트와 X 지수 확인
-- **X 지수 차트**: 실시간 인플루언서 영향력 지수 시각화
-- **롱/숏 거래**: 특정 인플루언서의 미래 영향력에 베팅
+- **리더보드**: 상위 야퍼(Yapper)들의 리스트와 Yap 개수 확인
+- **Yap 차트**: 30일간의 Yap 개수 변화율 시각화 (전날 대비 %)
+- **롱/숏 거래**: 특정 인플루언서의 미래 Yap 개수에 베팅
+- **Vault 시스템**: 각 인플루언서마다 독립적인 Vault (초기 유동성: 60 MON)
 
 ## 기술 스택
 
@@ -16,6 +17,7 @@
 - Recharts (차트)
 - React Router
 - Lucide React (아이콘)
+- Ethers.js (지갑 연결)
 
 ## 설치 및 실행
 
@@ -37,189 +39,120 @@ src/
 ├── components/       # 재사용 가능한 컴포넌트
 │   ├── Layout.tsx
 │   ├── YapperCard.tsx
-│   └── XIndexChart.tsx
+│   └── YapChart.tsx
 ├── pages/           # 페이지 컴포넌트
 │   ├── LeaderboardPage.tsx
-│   └── YapperDetailPage.tsx
-├── data/            # 데이터 및 API 관련
-│   └── mockData.ts  # 더미 데이터 및 API 연동 공간
+│   ├── YapperDetailPage.tsx
+│   └── MyWalletPage.tsx
+├── contexts/        # Context API
+│   └── WalletContext.tsx
+├── data/           # 데이터 및 API 관련
+│   ├── mockData.ts      # 더미 데이터 및 API 연동 공간
+│   └── analyticsData.ts # 포지션 및 거래 히스토리 데이터
 ├── types/           # TypeScript 타입 정의
 │   └── index.ts
+├── config/          # 설정 파일
+│   └── monad.ts     # Monad Testnet 설정 및 MON 가격
+├── utils/           # 유틸리티 함수
+│   └── vault.ts     # Vault 관련 유틸리티
 ├── App.tsx
 ├── main.tsx
 └── index.css
 ```
 
-## API 연동 가이드
+## 주요 기능 설명
 
-### 📍 파일 위치 및 작업 공간
+### 1. 리더보드 API 연동
 
-모든 API 연동 및 데이터 처리 로직은 다음 파일들에 구현되어 있습니다:
+**파일**: `src/data/mockData.ts`
 
-#### 1. 리더보드 야퍼 API 연동
-
-**파일 위치**: `src/data/mockData.ts` (144-150줄)
-
-**함수명**: `fetchYappersFromAPI()`
-
-**작업 공간**:
 ```typescript
 // TODO: 실제 API 연동 시 이 함수를 사용
 export async function fetchYappersFromAPI(): Promise<Yapper[]> {
-  // ⬇️ 여기에 리더보드 야퍼 API 연동 코드를 작성하세요
-  // 예: 
-  // const response = await fetch('YOUR_LEADERBOARD_API_ENDPOINT')
-  // const data = await response.json()
-  // return data.map(item => transformToYapper(item))
-  
+  // API 연동 코드를 여기에 작성하세요
+  // 예: const response = await fetch('YOUR_API_ENDPOINT')
+  // return await response.json()
   return mockYappers
 }
 ```
 
-**사용 위치**: `src/pages/LeaderboardPage.tsx` (17-22줄)
+### 2. Yap 데이터 API 연동
 
-리더보드 페이지에서 API를 사용하려면 주석을 해제하세요:
+**파일**: `src/data/mockData.ts`
+
 ```typescript
-// TODO: 실제 API 연동 시 이 부분을 수정하세요
-const [yappers, setYappers] = useState<Yapper[]>([])
-useEffect(() => {
-  fetchYappersFromAPI().then(setYappers)
-}, [])
-// const yappers = mockYappers  // ⬅️ 이 줄을 주석 처리
-```
-
-#### 2. X 지수 계산 로직
-
-**파일 위치**: `src/data/mockData.ts` (152-160줄)
-
-**함수명**: `calculateXIndex()`
-
-**작업 공간**:
-```typescript
-// TODO: 실제 X 지수 계산 로직을 여기에 작성
-export function calculateXIndex(yapper: Partial<Yapper>): number {
-  // ⬇️ 여기에 X 지수 계산 로직을 작성하세요
-  // 예시:
-  // const engagementRate = (yapper.smartFollowers || 0) / (yapper.followers || 1) * 100
-  // const yapsScore = (yapper.totalYaps || 0) * 0.1
-  // const kaitoScore = yapper.kaitoScore || 0
-  // return engagementRate * 0.4 + yapsScore * 0.3 + kaitoScore * 0.3
-  
-  return 0
-}
-```
-
-**사용 위치**: `src/pages/YapperDetailPage.tsx` (165줄 근처)
-
-상세 페이지에서 X 지수를 계산하려면:
-```typescript
-// TODO: 실제 X 지수 계산 로직을 여기에 통합하세요
-// 예: const calculatedIndex = calculateXIndex(yapper)
-// setCurrentXIndex(calculatedIndex)
-```
-
-#### 3. X (트위터) 관련 API 연동
-
-**새 파일 생성 권장**: `src/data/xApi.ts` 또는 `src/api/xApi.ts`
-
-**작업 공간** (새 파일 생성):
-```typescript
-// src/data/xApi.ts 또는 src/api/xApi.ts
-
-/**
- * X (트위터) API에서 인플루언서 데이터를 가져오는 함수들
- */
-
-// Kaito API 연동 예시
-export async function fetchYapperFromKaito(username: string) {
-  // ⬇️ 여기에 Kaito API 연동 코드를 작성하세요
-  // const response = await fetch(`KAITO_API_ENDPOINT/${username}`)
-  // return await response.json()
-}
-
-// X API 연동 예시 (트위터 API v2 등)
-export async function fetchXUserData(username: string) {
-  // ⬇️ 여기에 X/Twitter API 연동 코드를 작성하세요
-  // const response = await fetch(`X_API_ENDPOINT/users/by/username/${username}`)
-  // return await response.json()
-}
-
-// 실시간 X 지수 데이터 가져오기
-export async function fetchXIndexData(yapperId: string, timeframe: string) {
-  // ⬇️ 여기에 X 지수 시계열 데이터 API 연동 코드를 작성하세요
-  // const response = await fetch(`X_INDEX_API/${yapperId}?timeframe=${timeframe}`)
-  // return await response.json()
-}
-```
-
-**사용 방법**:
-- `src/data/mockData.ts`에서 import하여 사용
-- `src/pages/YapperDetailPage.tsx`에서 실시간 데이터 업데이트에 활용
-
-#### 4. Monad 트랜잭션 처리
-
-**파일 위치**: `src/pages/YapperDetailPage.tsx` (65-78줄)
-
-**함수명**: `handlePlaceTrade()`
-
-**작업 공간**:
-```typescript
-const handlePlaceTrade = async () => {
-  if (!tradeAmount || parseFloat(tradeAmount) <= 0) return
-  
-  // ⬇️ 여기에 Monad 체인 트랜잭션 처리 로직을 작성하세요
+// 30일 Yap 개수 차트 데이터 생성 함수 (전날 대비 % 변화)
+export function generateMockYapData(yapperId: string, baseYapCount: number): YapDataPoint[] {
+  // TODO: 실제 Kaito API에서 Yap 데이터를 가져와서 전날 대비 % 변화를 계산하세요
   // 예:
-  // const tx = await monadContract.placeTrade({
-  //   yapperId: yapper.id,
-  //   type: tradeType,
-  //   amount: parseFloat(tradeAmount),
-  //   leverage,
-  // })
-  // await tx.wait()
-  
-  alert(`Trade placed: ${tradeType.toUpperCase()} ${tradeAmount} USDC with ${leverage}x leverage`)
-  setTradeAmount('')
+  // const yapData = await fetchYapDataFromKaito(yapperId)
+  // return calculateChangePercentage(yapData)
 }
 ```
 
-**새 파일 생성 권장**: `src/utils/monad.ts` 또는 `src/contracts/monad.ts`
+### 3. 포지션 생성 및 Vault 연동
 
-스마트 컨트랙트 연동을 위한 별도 파일:
+**파일**: `src/pages/YapperDetailPage.tsx`
+
 ```typescript
-// src/utils/monad.ts 또는 src/contracts/monad.ts
-
-/**
- * Monad 체인과의 상호작용을 위한 유틸리티 함수들
- */
-
-export async function placeTradeOnMonad(params: {
-  yapperId: string
-  type: 'long' | 'short'
-  amount: number
-  leverage: number
-}) {
-  // ⬇️ 여기에 Monad 스마트 컨트랙트 호출 코드를 작성하세요
-  // 예: ethers.js 또는 viem 사용
+const handlePlaceTrade = () => {
+  // TODO: 실제 트랜잭션 처리
+  // 1. 사용자가 MON 토큰을 Vault에 예치
+  // 2. 레버리지에 따라 포지션 크기 계산 (예: 5 MON x 3 = 15 MON 포지션)
+  // 3. Vault에서 자동으로 같은 가격으로 반대 포지션 생성
+  // 4. 포지션을 My Wallet에 추가
 }
 ```
 
-## 작업 체크리스트
+**파일**: `src/utils/vault.ts`
 
-- [ ] `src/data/mockData.ts` - `fetchYappersFromAPI()` 함수에 리더보드 API 연동
-- [ ] `src/data/mockData.ts` - `calculateXIndex()` 함수에 X 지수 계산 로직 구현
-- [ ] `src/data/xApi.ts` (새 파일) - X/Twitter API 연동 함수들 작성
-- [ ] `src/utils/monad.ts` (새 파일) - Monad 체인 트랜잭션 처리 함수 작성
-- [ ] `src/pages/LeaderboardPage.tsx` - API 연동 활성화 (주석 해제)
-- [ ] `src/pages/YapperDetailPage.tsx` - X 지수 계산 로직 통합
-- [ ] `src/pages/YapperDetailPage.tsx` - Monad 트랜잭션 처리 연결
+```typescript
+// 각 인플루언서 Vault의 초기 유동성: 60 MON
+export const getVaultLiquidity = (yapperId: string): number => {
+  // TODO: 실제 Vault 컨트랙트에서 유동성 조회
+  return VAULT_INITIAL_LIQUIDITY // 60 MON
+}
+```
 
-## 디자인
+### 4. MON 토큰 가격
 
-- **테마**: 보라색 (Monad 브랜드 컬러)
-- **스타일**: 바이낸스 스타일의 깔끔한 UI
-- **색상 팔레트**: `monad-purple` (Tailwind 설정 참조)
+**파일**: `src/config/monad.ts`
 
-## 라이선스
+```typescript
+// MON 토큰 가격: $0.045 USDC (Premarket 가격)
+export const MON_PRICE_USDC = 0.045
+```
 
-MIT
+## Vault 시스템
 
+각 인플루언서마다 독립적인 Vault가 생성되며:
+
+- **초기 유동성**: 각 Vault마다 60개 MON 토큰
+- **Long 포지션**: 사용자가 MON 토큰을 예치하고 레버리지 배수만큼 포지션 생성
+  - 예: 5 MON 예치 + 3x 레버리지 = 15 MON 포지션
+- **Short 포지션**: Vault에서 자동으로 같은 가격으로 반대 포지션 생성
+- **포지션 관리**: 
+  - 활성 포지션은 My Wallet의 "활성 포지션"에 표시
+  - 마감된 포지션은 "거래 히스토리"로 이동
+
+## 네트워크 설정
+
+- **체인**: Monad Testnet
+- **Chain ID**: 10143
+- **RPC URL**: https://testnet-rpc.monad.xyz
+- **Block Explorer**: https://testnet.monadscan.com
+
+## 개발 체크리스트
+
+- [ ] 리더보드 API 연동 (`src/data/mockData.ts`)
+- [ ] Kaito API에서 Yap 데이터 가져오기 (`src/data/mockData.ts`)
+- [ ] Vault 컨트랙트 배포 및 연동 (`src/utils/vault.ts`)
+- [ ] 포지션 생성 트랜잭션 처리 (`src/pages/YapperDetailPage.tsx`)
+- [ ] 포지션 마감 트랜잭션 처리 (`src/utils/vault.ts`)
+- [ ] 실시간 포지션 업데이트
+
+## 참고사항
+
+- 현재는 Monad Testnet Token (MON)을 보유하고 있다는 가정 하에 개발되었습니다.
+- 실제 자산 교환(Swap) 기능은 메인넷 출시 시 구현 예정입니다.
+- MON 토큰 가격은 Premarket 가격인 $0.045 USDC로 고정되어 있습니다.

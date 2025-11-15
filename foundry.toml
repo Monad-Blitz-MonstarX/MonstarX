@@ -1,0 +1,15 @@
+[profile.default]
+src = "src/contracts"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.20"
+optimizer = true
+optimizer_runs = 200
+
+[rpc_endpoints]
+monad_testnet = "https://testnet-rpc.monad.xyz"
+
+# Etherscan verification (optional - remove if not needed)
+# [etherscan]
+# monad_testnet = { api_url = "https://testnet.monadscan.com/api", key = "YOUR_API_KEY" }
+

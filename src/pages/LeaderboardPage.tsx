@@ -4,16 +4,25 @@ import { mockYappers } from '../data/mockData'
 import { Yapper } from '../types'
 import { Search, TrendingUp, TrendingDown } from 'lucide-react'
 
-type TimeFilter = '24H' | '48H' | '7D' | '30D' | '3M' | '6M' | '12M' | 'All'
-
 export default function LeaderboardPage() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>('24H')
 
   const filteredYappers = useMemo(() => {
+    if (!searchQuery) return mockYappers
+    
+    const query = searchQuery.toLowerCase().trim()
+    
+    // # 태그로 검색 (예: #1, #2)
+    if (query.startsWith('#')) {
+      const id = query.slice(1)
+      return mockYappers.filter((yapper) => yapper.id === id)
+    }
+    
+    // 일반 검색 (이름, username)
     return mockYappers.filter((yapper) =>
-      yapper.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      yapper.username.toLowerCase().includes(searchQuery.toLowerCase())
+      yapper.name.toLowerCase().includes(query) ||
+      yapper.username.toLowerCase().includes(query) ||
+      yapper.id === query // ID로도 검색 가능
     )
   }, [searchQuery])
 
@@ -41,34 +50,17 @@ export default function LeaderboardPage() {
         </div>
 
         {/* Filters */}
-        <div className="mb-6 flex flex-col sm:flex-row gap-4">
+        <div className="mb-6">
           {/* Search */}
-          <div className="flex-1 relative">
+          <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search yappers..."
+              placeholder="Search yappers... (예: Haseeb, #1, hosseeb)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 bg-dark-card/60 border border-dark-border/50 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-monad-purple-500/60 focus:ring-2 focus:ring-monad-purple-500/20 backdrop-blur-sm"
             />
-          </div>
-
-          {/* Time Filter */}
-          <div className="flex gap-2 flex-wrap">
-            {(['24H', '48H', '7D', '30D', '3M', '6M', '12M', 'All'] as TimeFilter[]).map((filter) => (
-              <button
-                key={filter}
-                onClick={() => setTimeFilter(filter)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  timeFilter === filter
-                    ? 'bg-monad-purple-500/40 text-white border border-monad-purple-500/60 shadow-md shadow-monad-purple-500/20'
-                    : 'bg-dark-card/60 text-gray-300 hover:text-white hover:bg-dark-card/80 border border-dark-border/50'
-                }`}
-              >
-                {filter}
-              </button>
-            ))}
           </div>
         </div>
 
@@ -126,14 +118,14 @@ export default function LeaderboardPage() {
                   {/* Stats */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-400 text-xs">X Index</span>
+                      <span className="text-gray-400 text-xs">Total Yaps</span>
                       <div className="flex items-center gap-1.5">
                         {isPositive ? (
                           <TrendingUp className="w-4 h-4 text-green-400" />
                         ) : (
                           <TrendingDown className="w-4 h-4 text-red-400" />
                         )}
-                        <span className="font-bold text-white text-lg">{yapper.xIndex.toFixed(2)}</span>
+                        <span className="font-bold text-white text-lg">{yapper.totalYaps}</span>
                       </div>
                     </div>
                     
