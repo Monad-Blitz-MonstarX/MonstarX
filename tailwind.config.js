@@ -21,10 +21,10 @@ export default {
           950: '#2e1065',
         },
         'dark': {
-          bg: '#0a0a0f',
-          surface: '#13131a',
-          card: '#1a1a24',
-          border: '#252533',
+          bg: '#0f0f1a',
+          surface: '#1a1a2e',
+          card: '#252540',
+          border: '#3a3a5c',
         }
       },
       boxShadow: {

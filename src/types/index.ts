@@ -34,9 +34,62 @@ export interface Position {
 export interface Trade {
   id: string
   yapperId: string
+  yapperName?: string
   type: 'long' | 'short'
   size: number
   entryPrice: number
+  exitPrice?: number
   timestamp: number
+  closedAt?: number
+  pnl?: number
+  pnlPercentage?: number
+  status: 'open' | 'closed'
+}
+
+// 분석 관련 타입
+export interface UserTradingStats {
+  totalTrades: number
+  winRate: number
+  totalPnL: number
+  averageLeverage: number
+  longShortRatio: number // 롱 비율 (0-1)
+  favoriteYappers: Array<{
+    yapperId: string
+    yapperName: string
+    tradeCount: number
+    totalPnL: number
+  }>
+  tradingHistory: Array<{
+    date: string
+    trades: number
+    pnl: number
+  }>
+}
+
+export interface YapperTradingStats {
+  yapperId: string
+  yapperName: string
+  totalTraders: number
+  longShortRatio: number // 롱 비율 (0-1)
+  averageLeverage: number
+  totalVolume: number
+  popularity: number // 인기도 점수
+  traderSentiment: 'bullish' | 'bearish' | 'neutral'
+}
+
+export interface MarketAnalytics {
+  totalVolume: number
+  totalTraders: number
+  overallLongShortRatio: number
+  topYappers: Array<{
+    yapperId: string
+    yapperName: string
+    volume: number
+    traderCount: number
+  }>
+  volumeTrend: Array<{
+    date: string
+    volume: number
+  }>
 }
 
